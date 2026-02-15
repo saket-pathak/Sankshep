@@ -6,18 +6,39 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 
-# 🔥 DO NOT auto-download in production
-# Instead install once manually using:
-# python -m nltk.downloader punkt stopwords
+# =========================
+# SAFE NLTK SETUP FOR RENDER
+# =========================
 
+NLTK_DATA_DIR = os.path.join(os.getcwd(), "nltk_data")
+os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+
+nltk.data.path.append(NLTK_DATA_DIR)
+
+def ensure_nltk_data():
+    try:
+        nltk.data.find("tokenizers/punkt")
+    except LookupError:
+        nltk.download("punkt", download_dir=NLTK_DATA_DIR)
+
+    try:
+        nltk.data.find("corpora/stopwords")
+    except LookupError:
+        nltk.download("stopwords", download_dir=NLTK_DATA_DIR)
+
+ensure_nltk_data()
+
+# Load stopwords AFTER ensuring download
+STOP_WORDS = set(stopwords.words("english"))
+
+
+# =========================
+# OPTIONAL LLM SUPPORT
+# =========================
 try:
     from anthropic import Anthropic
 except ImportError:
     Anthropic = None
-
-
-# Load stopwords once (performance optimization)
-STOP_WORDS = set(stopwords.words("english"))
 
 
 def summarize_text(
@@ -27,16 +48,13 @@ def summarize_text(
     num_sentences: int = 3,
     format_type: str = "paragraph"
 ) -> str:
-    """
-    Main summarization function.
-    Uses Anthropic API only if mode == "llm".
-    Otherwise uses extractive summarization.
-    """
 
     if not text or len(text.strip()) < 50:
         return "Error: Text is too short. Please provide more content."
 
-    # 🔥 LLM MODE (Optional)
+    # =========================
+    # LLM MODE (Optional)
+    # =========================
     if mode == "llm" and Anthropic is not None:
         try:
             api_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -50,7 +68,7 @@ def summarize_text(
                     messages=[
                         {
                             "role": "user",
-                            "content": f"Summarize clearly and concisely in {num_sentences} sentences:\n\n{text}"
+                            "content": f"Summarize clearly in {num_sentences} sentences:\n\n{text}"
                         }
                     ]
                 )
@@ -62,7 +80,9 @@ def summarize_text(
         except Exception as e:
             print(f"Anthropic API Error: {e}")
 
-    # 🔥 Basic Extractive Summarization
+    # =========================
+    # BASIC EXTRACTIVE MODE
+    # =========================
     return basic_summarize(
         text=text,
         num_sentences=num_sentences,
@@ -71,16 +91,12 @@ def summarize_text(
 
 
 def basic_summarize(text: str, num_sentences: int = 3, mode: str = "paragraph") -> str:
-    """
-    Extractive summarization using word frequency scoring.
-    """
 
     sentences = sent_tokenize(text)
 
     if not sentences:
         return "Error: Could not extract sentences."
 
-    # Clamp sentence count safely
     num_sentences = max(1, min(num_sentences, len(sentences)))
 
     words = word_tokenize(text.lower())
@@ -103,11 +119,9 @@ def basic_summarize(text: str, num_sentences: int = 3, mode: str = "paragraph") 
                 sentence_scores[sentence] += freq_table[word]
                 word_count += 1
 
-        # Normalize by sentence length
         if word_count > 0:
             sentence_scores[sentence] /= word_count
 
-    # Sort by score
     sorted_sentences = sorted(
         sentence_scores,
         key=sentence_scores.get,
@@ -122,7 +136,7 @@ def basic_summarize(text: str, num_sentences: int = 3, mode: str = "paragraph") 
     return " ".join(top_sentences)
 
 
-# Optional standalone test
+# Standalone test
 if __name__ == "__main__":
     sample_text = """
     Claude is an advanced AI assistant developed by Anthropic.
