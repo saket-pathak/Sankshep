@@ -3,19 +3,28 @@ import traceback
 from flask import Flask, render_template, request, jsonify
 from summarizer import summarize_text
 
-# 🔥 FIRST create app
+# =========================
+# CREATE FLASK APP
+# =========================
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# THEN define constants
+# =========================
+# LIMITS
+# =========================
 MAX_CHAR_LIMIT = 15000
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+MAX_FILE_SIZE = 1 * 1024 * 1024   # ✅ 1MB limit
 
-# THEN routes
+# =========================
+# HOME ROUTE
+# =========================
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# =========================
+# SUMMARIZE ROUTE
+# =========================
 @app.route('/summarize', methods=['POST'])
 def summarize():
     try:
@@ -58,6 +67,7 @@ def summarize():
                     "message": "Only .txt files are supported."
                 }), 400
 
+            # Check file size (1MB)
             uploaded_file.seek(0, os.SEEK_END)
             file_size = uploaded_file.tell()
             uploaded_file.seek(0)
@@ -102,7 +112,7 @@ def summarize():
                 "message": "Text must contain at least 50 characters."
             }), 400
 
-        # Auto trim for large text
+        # Trim large content automatically
         if len(text) > MAX_CHAR_LIMIT:
             text = text[:MAX_CHAR_LIMIT]
             trimmed = True
@@ -144,7 +154,10 @@ def summarize():
             "success": False,
             "message": "An unexpected error occurred."
         }), 500
-    
-if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
 
+
+# =========================
+# LOCAL RUN (DEV ONLY)
+# =========================
+if __name__ == "__main__":
+    app.run(debug=True)
