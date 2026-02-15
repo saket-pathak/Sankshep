@@ -1,0 +1,186 @@
+/* =========================
+   THEME VARIABLES
+========================= */
+
+:root {
+    --bg-gradient: linear-gradient(-45deg, #4e73df, #1cc88a, #36b9cc, #224abe);
+    --text-color: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.18);
+    --card-border: rgba(255, 255, 255, 0.3);
+    --summary-card-bg: #ffffff;
+    --summary-text-color: #000000;
+    --textarea-bg: rgba(255,255,255,0.9);
+    --textarea-text: #000000;
+    --button-outline-color: #000000;
+}
+
+/* DARK MODE VARIABLES */
+body.dark-mode {
+    --bg-gradient: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #000000);
+    --text-color: #f1f1f1;
+    --card-bg: rgba(20, 20, 30, 0.85);
+    --card-border: rgba(255,255,255,0.1);
+    --summary-card-bg: #1e1e1e;
+    --summary-text-color: #ffffff;
+    --textarea-bg: #2a2a3d;
+    --textarea-text: #ffffff;
+    --button-outline-color: #ffffff;
+}
+
+
+/* =========================
+   GLOBAL SMOOTH TRANSITION
+========================= */
+
+body,
+.card,
+.glass-card,
+textarea,
+input,
+button,
+.card-header,
+.card-body,
+label,
+.form-check-label,
+.form-text {
+    transition:
+        background 0.6s ease,
+        background-color 0.6s ease,
+        color 0.6s ease,
+        border-color 0.6s ease,
+        box-shadow 0.6s ease;
+}
+
+
+/* =========================
+   BACKGROUND
+========================= */
+
+body {
+    background: var(--bg-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+/* =========================
+   GLASS CARD
+========================= */
+
+.glass-card {
+    backdrop-filter: blur(18px);
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    animation: floatUp 0.8s ease-out, glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes floatUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+    to { box-shadow: 0 0 40px rgba(0,255,200,0.3); }
+}
+
+
+/* Remove Bootstrap white override */
+.card-body {
+    background: transparent !important;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.card-header {
+    background: transparent;
+    text-align: center;
+    border-bottom: none;
+    color: var(--text-color);
+}
+
+.card-header h2 {
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+
+/* =========================
+   TEXTAREA
+========================= */
+
+textarea.form-control {
+    min-height: 200px;
+    font-size: 16px;
+    border-radius: 12px;
+    background-color: var(--textarea-bg);
+    color: var(--textarea-text);
+    border: 1px solid #ccc;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.btn-outline-secondary {
+    border-radius: 10px;
+    color: var(--button-outline-color);
+    border-color: var(--button-outline-color);
+}
+
+
+/* =========================
+   SUMMARY AREA
+========================= */
+
+#summaryResult .card {
+    background-color: var(--summary-card-bg);
+    color: var(--summary-text-color);
+}
+
+#summaryText {
+    white-space: pre-line;
+    font-size: 15px;
+    color: var(--summary-text-color);
+}
+
+
+/* =========================
+   TYPING CURSOR EFFECT
+========================= */
+
+.typing {
+    border-right: 2px solid currentColor;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
